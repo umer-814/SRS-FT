@@ -426,76 +426,146 @@ const Home = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Cryptocurrencies */}
           <div className="lg:col-span-2">
-            {/* Primary Coins (BTC & ETH) */}
+            {/* Primary Coins (BTC & ETH) - Highlighted */}
+            <div className="mb-6">
+              <motion.h2
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="text-2xl font-bold text-white mb-4 flex items-center"
+              >
+                🪙 Major Coins
+              </motion.h2>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              {cryptoPrices.filter(crypto => crypto.primary).map((crypto) => (
-                <div key={crypto.symbol} className="glass rounded-xl p-6 border border-dark-border card-hover">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 bg-electric-blue/20 rounded-full flex items-center justify-center text-2xl">
-                        {crypto.icon}
+              {cryptoPrices.filter(crypto => crypto.primary).map((crypto, index) => (
+                <motion.div
+                  key={crypto.symbol}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ scale: 1.02, boxShadow: '0 10px 40px rgba(59, 130, 246, 0.3)' }}
+                  className={`glass rounded-2xl p-6 border-2 ${
+                    crypto.symbol === 'BTC'
+                      ? 'border-gold-highlight/50 bg-gradient-to-br from-dark-card to-amber-950/10'
+                      : 'border-purple-500/50 bg-gradient-to-br from-dark-card to-purple-950/10'
+                  } card-hover relative overflow-hidden`}
+                >
+                  {/* Animated background glow */}
+                  <motion.div
+                    className={`absolute inset-0 opacity-10 blur-3xl ${
+                      crypto.symbol === 'BTC' ? 'bg-gold-highlight' : 'bg-purple-500'
+                    }`}
+                    animate={{
+                      scale: [1, 1.2, 1],
+                      opacity: [0.1, 0.2, 0.1],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }}
+                  />
+
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center space-x-3">
+                        <motion.div
+                          className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl ${
+                            crypto.symbol === 'BTC' ? 'bg-gold-highlight/20' : 'bg-purple-500/20'
+                          }`}
+                          whileHover={{ rotate: [0, -10, 10, 0] }}
+                          transition={{ duration: 0.5 }}
+                        >
+                          {crypto.icon}
+                        </motion.div>
+                        <div>
+                          <h3 className="font-bold text-white text-xl">{crypto.name}</h3>
+                          <p className="text-sm text-gray-400">{crypto.symbol}</p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="font-bold text-white text-lg">{crypto.name}</h3>
-                        <p className="text-sm text-gray-400">{crypto.symbol}</p>
-                      </div>
-                    </div>
-                    <SparklineChart change={crypto.change} />
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-400">Price (USD)</span>
-                      <span className="text-2xl font-bold text-white">
-                        ${crypto.priceUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </span>
+                      <SparklineChart change={crypto.change} />
                     </div>
 
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-400">Price (PKR)</span>
-                      <span className="text-lg font-semibold text-electric-blue">
-                        ₨{crypto.pricePKR.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-400">24h Change</span>
-                      <div className="flex items-center space-x-1">
-                        {crypto.change >= 0 ? (
-                          <TrendingUp className="h-4 w-4 text-profit-green" />
-                        ) : (
-                          <TrendingDown className="h-4 w-4 text-risk-red" />
-                        )}
-                        <span className={`font-semibold ${
-                          crypto.change >= 0 ? 'text-profit-green' : 'text-risk-red'
-                        }`}>
-                          {crypto.change >= 0 ? '+' : ''}{crypto.change.toFixed(2)}%
-                        </span>
+                    <div className="space-y-4">
+                      {/* USD Price */}
+                      <div className="bg-dark-primary/50 rounded-xl p-4 border border-dark-border">
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-400 text-sm">USD Price</span>
+                          {loading || !crypto.priceUSD ? (
+                            <div className="h-8 w-32 bg-gray-700 animate-pulse rounded"></div>
+                          ) : (
+                            <motion.span
+                              className="text-2xl font-bold text-white font-mono"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              key={crypto.priceUSD}
+                            >
+                              ${crypto.priceUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </motion.span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4 pt-3 border-t border-dark-border">
-                      <div>
-                        <p className="text-xs text-gray-400">Volume</p>
-                        <p className="text-sm font-semibold text-white">{crypto.volume}</p>
+
+                      {/* PKR Price */}
+                      <div className="bg-dark-primary/50 rounded-xl p-4 border border-dark-border">
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-400 text-sm">PKR Price</span>
+                          {loading || !crypto.pricePKR ? (
+                            <div className="h-6 w-32 bg-gray-700 animate-pulse rounded"></div>
+                          ) : (
+                            <motion.span
+                              className="text-xl font-bold text-electric-blue font-mono"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              key={crypto.pricePKR}
+                            >
+                              ₨{crypto.pricePKR.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                            </motion.span>
+                          )}
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-xs text-gray-400">Market Cap</p>
-                        <p className="text-sm font-semibold text-white">{crypto.marketCap}</p>
+
+                      {/* 24h Change */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-400 text-sm">24h Change</span>
+                        <div className="flex items-center space-x-2">
+                          {crypto.change >= 0 ? (
+                            <TrendingUp className="h-5 w-5 text-profit-green" />
+                          ) : (
+                            <TrendingDown className="h-5 w-5 text-risk-red" />
+                          )}
+                          <motion.span
+                            className={`font-bold text-lg ${
+                              crypto.change >= 0 ? 'text-profit-green' : 'text-risk-red'
+                            }`}
+                            animate={{
+                              scale: hasUpdated ? [1, 1.1, 1] : 1,
+                            }}
+                          >
+                            {crypto.change >= 0 ? '+' : ''}{crypto.change.toFixed(2)}%
+                          </motion.span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
 
-            {/* Other Cryptocurrencies */}
-            <div className="glass rounded-xl border border-dark-border overflow-hidden">
-              <div className="p-6 border-b border-dark-border">
+            {/* Altcoins Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="glass rounded-xl border border-dark-border overflow-hidden"
+            >
+              <div className="p-6 border-b border-dark-border bg-gradient-to-r from-dark-card to-dark-primary">
                 <h2 className="text-xl font-semibold text-white flex items-center">
-                  <Activity className="h-5 w-5 mr-2" />
-                  Other Cryptocurrencies
+                  <Activity className="h-5 w-5 mr-2 text-electric-blue" />
+                  🪙 Altcoins
                 </h2>
+                <p className="text-sm text-gray-400 mt-1">Top alternative cryptocurrencies</p>
               </div>
               <div className="divide-y divide-dark-border">
                 {cryptoPrices.filter(crypto => !crypto.primary).map((crypto) => (
@@ -531,7 +601,7 @@ const Home = () => {
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* News & Market Status */}

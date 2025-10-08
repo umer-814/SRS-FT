@@ -414,8 +414,150 @@ const RecoveryTool = () => {
 
             {results && (
               <div className="space-y-6">
+                {/* Empathetic Status Card */}
+                {results.isLiquidated && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="glass border-2 border-rose-500/50 rounded-2xl p-8 bg-gradient-to-br from-rose-950/30 to-dark-card relative overflow-hidden"
+                  >
+                    <motion.div
+                      className="absolute inset-0 bg-rose-500/10"
+                      animate={{ opacity: [0.1, 0.2, 0.1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                    <div className="relative z-10 text-center">
+                      <motion.div
+                        className="text-6xl mb-4"
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        💔
+                      </motion.div>
+                      <h3 className="text-2xl font-bold text-rose-400 mb-3">
+                        Position Liquidated
+                      </h3>
+                      <p className="text-gray-300 mb-4 leading-relaxed">
+                        Sorry, your trade has already been liquidated.<br/>
+                        We cannot recover this position as the margin has been fully lost.
+                      </p>
+                      <div className="bg-dark-primary/50 rounded-xl p-4 mb-4">
+                        <p className="text-sm text-gray-400 mb-1">Total Loss</p>
+                        <p className="text-2xl font-bold text-rose-400">
+                          ${formData.margin} USDT
+                        </p>
+                      </div>
+                      <p className="text-gray-400 text-sm italic">
+                        Remember — every loss is a lesson. Learn and come back stronger.
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+
+                {results.isProfit && !results.isLiquidated && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="glass border-2 border-profit-green/50 rounded-2xl p-8 bg-gradient-to-br from-green-950/30 to-dark-card relative overflow-hidden"
+                  >
+                    <motion.div
+                      className="absolute inset-0 bg-profit-green/10"
+                      animate={{ opacity: [0.1, 0.2, 0.1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                    <div className="relative z-10 text-center">
+                      <motion.div
+                        className="text-6xl mb-4"
+                        animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.2, 1] }}
+                        transition={{ duration: 0.6 }}
+                      >
+                        🎉
+                      </motion.div>
+                      <h3 className="text-2xl font-bold text-profit-green mb-3">
+                        Congratulations! You're in Profit
+                      </h3>
+                      <p className="text-gray-300 mb-4 leading-relaxed">
+                        Your position is performing well — no recovery needed at this time.
+                      </p>
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div className="bg-dark-primary/50 rounded-xl p-4">
+                          <p className="text-sm text-gray-400 mb-1">Unrealized PnL</p>
+                          <p className="text-2xl font-bold text-profit-green">
+                            +${Math.abs(results.pnlAmount).toFixed(2)}
+                          </p>
+                        </div>
+                        <div className="bg-dark-primary/50 rounded-xl p-4">
+                          <p className="text-sm text-gray-400 mb-1">Profit %</p>
+                          <p className="text-2xl font-bold text-profit-green">
+                            +{Math.abs(results.pnlPercent).toFixed(2)}%
+                          </p>
+                        </div>
+                      </div>
+                      <div className="bg-gold-highlight/10 border border-gold-highlight/30 rounded-xl p-4">
+                        <p className="text-gold-highlight text-sm font-semibold mb-2">💡 Pro Tip</p>
+                        <p className="text-gray-300 text-sm">
+                          Lock partial profits and let the rest ride to reduce emotional pressure.
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {!results.isProfit && !results.isLiquidated && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="glass border-2 border-amber-500/50 rounded-2xl p-8 bg-gradient-to-br from-amber-950/30 to-dark-card relative overflow-hidden"
+                  >
+                    <motion.div
+                      className="absolute inset-0 bg-amber-500/10"
+                      animate={{ opacity: [0.1, 0.2, 0.1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                    <div className="relative z-10 text-center">
+                      <motion.div
+                        className="text-6xl mb-4"
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                      >
+                        ⚠️
+                      </motion.div>
+                      <h3 className="text-2xl font-bold text-amber-400 mb-3">
+                        Position Under Pressure
+                      </h3>
+                      <p className="text-gray-300 mb-4 leading-relaxed">
+                        Your position is in loss, but not liquidated yet.<br/>
+                        Our AI recommends a recovery plan to minimize risk.
+                      </p>
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div className="bg-dark-primary/50 rounded-xl p-4">
+                          <p className="text-sm text-gray-400 mb-1">Current Loss</p>
+                          <p className="text-xl font-bold text-risk-red">
+                            -${Math.abs(results.pnlAmount).toFixed(2)}
+                          </p>
+                        </div>
+                        <div className="bg-dark-primary/50 rounded-xl p-4">
+                          <p className="text-sm text-gray-400 mb-1">Liquidation Distance</p>
+                          <p className={`text-xl font-bold ${
+                            parseFloat(results.riskMetrics?.liquidationDistance || '0') < 10
+                              ? 'text-risk-red'
+                              : 'text-amber-400'
+                          }`}>
+                            {results.riskMetrics?.liquidationDistance}%
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
                 {/* Current Position Status */}
-                <div className="glass border border-electric-blue/30 rounded-lg p-4 bg-electric-blue/5">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="glass border border-electric-blue/30 rounded-lg p-4 bg-electric-blue/5"
+                >
                   <h3 className="font-semibold text-white mb-4">Position Status</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -445,7 +587,7 @@ const RecoveryTool = () => {
                       </p>
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* AI Selected Strategy */}
                 <div className="glass border border-dark-border rounded-lg p-4">
