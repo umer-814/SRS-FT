@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Shield, Zap } from 'lucide-react';
+import { Shield, Zap, ChevronDown } from 'lucide-react';
 
 interface HeroSectionProps {
   onComplete?: () => void;
@@ -209,6 +209,26 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onComplete, standalone = fals
             ))}
           </motion.div>
 
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 2, duration: 0.8 }}
+            className="flex flex-col items-center text-gray-500"
+          >
+            <p className="text-sm mb-2">Explore the Market</p>
+            <motion.div
+              animate={{
+                y: [0, 10, 0],
+              }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+            >
+              <ChevronDown className="h-6 w-6" />
+            </motion.div>
+          </motion.div>
         </div>
       </div>
     </div>

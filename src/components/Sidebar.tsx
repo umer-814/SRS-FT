@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Menu, X, TrendingUp, Italic as Crystal, Wrench, Bell, FileText, Zap, User, LogOut, ChevronDown, Lock } from 'lucide-react';
+import { Menu, X, TrendingUp, Italic as Crystal, Wrench, Bell, FileText, Zap, User, LogOut, ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import AuthRequiredModal from './AuthRequiredModal';
 
@@ -104,29 +104,30 @@ const Sidebar = () => {
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
-            const isLocked = !item.public && !isAuthenticated;
-
+            const disabled = !item.public && !isAuthenticated;
+            
             return (
-              <motion.button
+              <button
                 key={item.path}
                 onClick={() => handleNavClick(item.path, item.public)}
-                whileHover={{ scale: 1.02, x: 4 }}
-                whileTap={{ scale: 0.98 }}
+                disabled={disabled}
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all duration-200 group ${
-                  active
-                    ? 'bg-electric-blue text-white glow-blue'
+                  active 
+                    ? 'bg-electric-blue text-white glow-blue' 
+                    : disabled
+                    ? 'text-gray-500 cursor-not-allowed'
                     : 'text-gray-300 hover:bg-dark-card hover:text-white'
                 }`}
               >
                 <span className="text-lg">{item.emoji}</span>
-                <Icon className={`h-5 w-5 ${active ? 'text-white' : 'text-gray-400 group-hover:text-white'}`} />
+                <Icon className={`h-5 w-5 ${active ? 'text-white' : disabled ? 'text-gray-500' : 'text-gray-400 group-hover:text-white'}`} />
                 <span className="font-medium">{item.label}</span>
-                {isLocked && (
+                {disabled && (
                   <div className="ml-auto">
-                    <Lock className="h-4 w-4 text-gold-highlight" />
+                    <div className="w-2 h-2 bg-gold-highlight rounded-full animate-pulse" />
                   </div>
                 )}
-              </motion.button>
+              </button>
             );
           })}
         </nav>
