@@ -143,6 +143,7 @@ const Home = () => {
           priceUSD: prices.bitcoin.usd,
           pricePKR: prices.bitcoin.pkr,
           change: prices.bitcoin.usd_24h_change,
+          primary: true,
         },
         {
           symbol: 'ETH',
@@ -152,6 +153,7 @@ const Home = () => {
           priceUSD: prices.ethereum.usd,
           pricePKR: prices.ethereum.pkr,
           change: prices.ethereum.usd_24h_change,
+          primary: true,
         },
         {
           symbol: 'BNB',
@@ -161,6 +163,7 @@ const Home = () => {
           priceUSD: prices.binancecoin.usd,
           pricePKR: prices.binancecoin.pkr,
           change: prices.binancecoin.usd_24h_change,
+          primary: false,
         },
         {
           symbol: 'SOL',
@@ -170,6 +173,7 @@ const Home = () => {
           priceUSD: prices.solana.usd,
           pricePKR: prices.solana.pkr,
           change: prices.solana.usd_24h_change,
+          primary: false,
         },
         {
           symbol: 'XRP',
@@ -179,6 +183,7 @@ const Home = () => {
           priceUSD: prices.ripple.usd,
           pricePKR: prices.ripple.pkr,
           change: prices.ripple.usd_24h_change,
+          primary: false,
         },
       ]);
     }
