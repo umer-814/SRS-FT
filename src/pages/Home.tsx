@@ -265,65 +265,162 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Market Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="glass rounded-xl p-6 border border-dark-border card-hover">
+        {/* Global Market Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+          <motion.div
+            className="glass rounded-xl p-6 border border-dark-border card-hover"
+            whileHover={{ scale: 1.02, boxShadow: '0 0 30px rgba(59, 130, 246, 0.3)' }}
+          >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm">Total Market Cap</p>
-                <p className="text-2xl font-bold text-white">${marketStats.totalMarketCap.toFixed(2)}T</p>
-                <p className="text-profit-green text-sm mt-1">+2.4% (24h)</p>
+                <p className="text-gray-400 text-sm">🌍 Total Market Cap</p>
+                {loading || !globalMetrics ? (
+                  <div className="mt-2 space-y-2">
+                    <div className="h-7 w-32 bg-gray-700 animate-pulse rounded"></div>
+                  </div>
+                ) : (
+                  <motion.p
+                    className="text-2xl font-bold text-white"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    ${(globalMetrics.totalMarketCap / 1e12).toFixed(2)}T
+                  </motion.p>
+                )}
               </div>
               <div className="p-3 bg-electric-blue/10 rounded-lg">
                 <Activity className="h-6 w-6 text-electric-blue" />
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="glass rounded-xl p-6 border border-dark-border card-hover">
+          <motion.div
+            className="glass rounded-xl p-6 border border-dark-border card-hover"
+            whileHover={{ scale: 1.02, boxShadow: '0 0 30px rgba(34, 197, 94, 0.3)' }}
+          >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm">24h Volume</p>
-                <p className="text-2xl font-bold text-white">${marketStats.volume24h.toFixed(1)}B</p>
-                <p className="text-profit-green text-sm mt-1">+5.7% (24h)</p>
+                <p className="text-gray-400 text-sm">📊 24h Volume</p>
+                {loading || !globalMetrics ? (
+                  <div className="mt-2 space-y-2">
+                    <div className="h-7 w-32 bg-gray-700 animate-pulse rounded"></div>
+                  </div>
+                ) : (
+                  <motion.p
+                    className="text-2xl font-bold text-white"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    ${(globalMetrics.volume24h / 1e9).toFixed(1)}B
+                  </motion.p>
+                )}
               </div>
               <div className="p-3 bg-profit-green/10 rounded-lg">
                 <TrendingUp className="h-6 w-6 text-profit-green" />
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="glass rounded-xl p-6 border border-dark-border card-hover">
+          <motion.div
+            className="glass rounded-xl p-6 border border-dark-border card-hover"
+            whileHover={{ scale: 1.02, boxShadow: '0 0 30px rgba(251, 191, 36, 0.3)' }}
+          >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm">BTC Dominance</p>
-                <p className="text-2xl font-bold text-white">{marketStats.btcDominance.toFixed(1)}%</p>
-                <p className="text-risk-red text-sm mt-1">-0.3% (24h)</p>
+                <p className="text-gray-400 text-sm">🪙 BTC Dominance</p>
+                {loading || !globalMetrics ? (
+                  <div className="mt-2 space-y-2">
+                    <div className="h-7 w-24 bg-gray-700 animate-pulse rounded"></div>
+                  </div>
+                ) : (
+                  <motion.p
+                    className="text-2xl font-bold text-white"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    {globalMetrics.btcDominance.toFixed(1)}%
+                  </motion.p>
+                )}
               </div>
               <div className="p-3 bg-gold-highlight/10 rounded-lg">
                 <span className="text-2xl">₿</span>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="glass rounded-xl p-6 border border-dark-border card-hover">
+          <motion.div
+            className="glass rounded-xl p-6 border border-dark-border card-hover"
+            whileHover={{ scale: 1.02, boxShadow: '0 0 30px rgba(139, 92, 246, 0.3)' }}
+          >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm">Fear & Greed</p>
-                <p className="text-2xl font-bold text-white">{Math.round(marketStats.fearGreedIndex)}</p>
-                <p className="text-gold-highlight text-sm mt-1">
-                  {marketStats.fearGreedIndex > 50 ? 'Greed' : 'Fear'}
-                </p>
+                <p className="text-gray-400 text-sm">💎 ETH Dominance</p>
+                {loading || !globalMetrics ? (
+                  <div className="mt-2 space-y-2">
+                    <div className="h-7 w-24 bg-gray-700 animate-pulse rounded"></div>
+                  </div>
+                ) : (
+                  <motion.p
+                    className="text-2xl font-bold text-white"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    {globalMetrics.ethDominance.toFixed(1)}%
+                  </motion.p>
+                )}
               </div>
-              <div className="p-3 bg-gold-highlight/10 rounded-lg">
-                <div className={`w-6 h-6 rounded-full ${
-                  marketStats.fearGreedIndex > 75 ? 'bg-profit-green' :
-                  marketStats.fearGreedIndex > 50 ? 'bg-gold-highlight' :
-                  marketStats.fearGreedIndex > 25 ? 'bg-orange-500' : 'bg-risk-red'
-                } animate-pulse`} />
+              <div className="p-3 bg-purple-500/10 rounded-lg">
+                <span className="text-2xl">💎</span>
               </div>
             </div>
-          </div>
+          </motion.div>
+
+          <motion.div
+            className="glass rounded-xl p-6 border border-dark-border card-hover relative overflow-hidden"
+            whileHover={{ scale: 1.02, boxShadow: '0 0 30px rgba(251, 191, 36, 0.3)' }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-400 text-sm">😨😄 Fear & Greed</p>
+                {loading || !fearGreed ? (
+                  <div className="mt-2 space-y-2">
+                    <div className="h-7 w-16 bg-gray-700 animate-pulse rounded"></div>
+                  </div>
+                ) : (
+                  <>
+                    <motion.p
+                      className="text-2xl font-bold text-white"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                    >
+                      {fearGreed.value}
+                    </motion.p>
+                    <p className={`text-sm mt-1 font-semibold ${
+                      fearGreed.classification.includes('Fear') ? 'text-risk-red' :
+                      fearGreed.classification === 'Neutral' ? 'text-gold-highlight' :
+                      'text-profit-green'
+                    }`}>
+                      {fearGreed.classification}
+                    </p>
+                  </>
+                )}
+              </div>
+              <div className="p-3 bg-gold-highlight/10 rounded-lg">
+                {!loading && fearGreed && (
+                  <motion.div
+                    className={`w-6 h-6 rounded-full ${
+                      fearGreed.value > 75 ? 'bg-profit-green' :
+                      fearGreed.value > 55 ? 'bg-gold-highlight' :
+                      fearGreed.value > 45 ? 'bg-yellow-500' :
+                      fearGreed.value > 25 ? 'bg-orange-500' : 'bg-risk-red'
+                    }`}
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                )}
+              </div>
+            </div>
+          </motion.div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

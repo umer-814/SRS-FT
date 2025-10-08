@@ -118,42 +118,83 @@ const RecoveryTool = () => {
       const isLong = formData.position === 'Long';
 
       const priceChangePercent = ((currentPrice - entryPrice) / entryPrice) * 100;
-      const pnlPercent = (isLong ? priceChangePercent : -priceChangePercent) * leverage;
-      const pnlAmount = (tradeSize * pnlPercent) / 100;
+      const directedPriceChange = isLong ? priceChangePercent : -priceChangePercent;
+      const pnlPercent = directedPriceChange * leverage;
+      const pnlAmount = (margin * pnlPercent) / 100;
 
       const liquidationPrice = isLong
-        ? entryPrice * (1 - (1 / leverage))
-        : entryPrice * (1 + (1 / leverage));
+        ? entryPrice * (1 - (1 / leverage) * 0.9)
+        : entryPrice * (1 + (1 / leverage) * 0.9);
+
+      const hasReachedLiquidation = isLong
+        ? currentPrice <= liquidationPrice
+        : currentPrice >= liquidationPrice;
+
+      const totalLoss = Math.abs(pnlAmount);
+      const isLiquidated = hasReachedLiquidation || totalLoss >= margin;
 
       const liquidationDistance = Math.abs((currentPrice - liquidationPrice) / currentPrice * 100);
       const isProfit = pnlPercent > 0;
 
-      const selectedStrategy = isProfit
-        ? {
-            title: '🎉 Position in Profit',
-            description: 'Your trade is performing well',
-            actions: [
-              'Consider taking partial profits',
-              'Move stop-loss to break-even',
-              'Monitor for trend reversal signals',
-            ],
-            risk: 'Low',
-          }
-        : recoveryStrategies[Math.floor(Math.random() * recoveryStrategies.length)];
+      let selectedStrategy;
+      let recommendations;
+      let tradeStatus: 'profit' | 'loss' | 'liquidated';
 
-      const recommendations = isProfit
-        ? [
-            `🎉 Congratulations! You are currently in profit (+${pnlPercent.toFixed(2)}%)`,
-            'Keep monitoring and manage risk carefully',
-            'Consider setting a trailing stop-loss',
-            'Take partial profits if you are comfortable',
-          ]
-        : [
-            `⚠️ Position at ${pnlPercent.toFixed(2)}% loss`,
-            'Consider adding margin to avoid liquidation',
-            `Liquidation price: $${liquidationPrice.toFixed(2)}`,
-            'Review your risk management strategy',
-          ];
+      if (isLiquidated) {
+        tradeStatus = 'liquidated';
+        selectedStrategy = {
+          title: '💔 Position Liquidated',
+          description: 'This trade has been liquidated',
+          actions: [
+            'Take time to analyze what went wrong',
+            'Review your risk management approach',
+            'Consider lower leverage for future trades',
+            'Never risk more than you can afford to lose',
+          ],
+          risk: 'Critical',
+        };
+        recommendations = [
+          '💔 Sorry, your trade has already been liquidated.',
+          'We cannot recover this position as the margin has been fully lost.',
+          `Total loss: $${margin.toFixed(2)} USDT`,
+          'Remember — every loss is a lesson. Learn and come back stronger.',
+          'Consider: Using lower leverage, setting stop-losses, and proper position sizing.',
+        ];
+      } else if (isProfit) {
+        tradeStatus = 'profit';
+        selectedStrategy = {
+          title: '🎉 Congratulations! You are in Profit',
+          description: 'Your position is performing well',
+          actions: [
+            'Consider taking partial profits (50-70%)',
+            'Move stop-loss to break-even or entry price',
+            'Let remaining position ride with trailing stop',
+            'Avoid greed — secure your gains',
+          ],
+          risk: 'Low',
+        };
+        recommendations = [
+          `🎉 Congratulations! You are currently in profit (+${Math.abs(pnlPercent).toFixed(2)}%)`,
+          `Unrealized PnL: +$${Math.abs(pnlAmount).toFixed(2)} USDT`,
+          'Your position is performing well — no recovery needed at this time.',
+          '💡 Pro Tip: Lock partial profits and let the rest ride to reduce emotional pressure.',
+          'Consider securing gains or setting a trailing stop-loss to protect profits.',
+        ];
+      } else {
+        tradeStatus = 'loss';
+        const riskLevel = liquidationDistance < 5 ? 'High' : liquidationDistance < 15 ? 'Medium' : 'Low';
+        selectedStrategy = recoveryStrategies.find(s => s.risk === riskLevel) || recoveryStrategies[0];
+
+        recommendations = [
+          `⚠️ Your position is under pressure (${pnlPercent.toFixed(2)}% loss)`,
+          `Current loss: -$${Math.abs(pnlAmount).toFixed(2)} USDT`,
+          `Liquidation distance: ${liquidationDistance.toFixed(1)}% away`,
+          liquidationDistance < 10
+            ? '🚨 URGENT: Add margin immediately or close position to avoid liquidation!'
+            : 'Our AI recommends a recovery plan to minimize risk and optimize your exit.',
+          'Consider DCA, adding margin, or reducing leverage to recover safely.',
+        ];
+      }
 
       setResults({
         currentPrice,
@@ -162,6 +203,8 @@ const RecoveryTool = () => {
         pnlPercent,
         pnlAmount,
         isProfit,
+        isLiquidated,
+        tradeStatus,
         selectedStrategy,
         riskMetrics: {
           marginRatio: ((margin / tradeSize) * 100).toFixed(1),
@@ -178,6 +221,7 @@ const RecoveryTool = () => {
       case 'Low': return 'text-green-400 bg-green-900/30';
       case 'Medium': return 'text-yellow-400 bg-yellow-900/30';
       case 'High': return 'text-red-400 bg-red-900/30';
+      case 'Critical': return 'text-rose-400 bg-rose-900/30 border border-rose-500/50';
       default: return 'text-gray-400 bg-gray-900/30';
     }
   };
