@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { fetchCryptoPrices, CoinPrice } from '../services/api';
+import { fetchCryptoPrices, fetchCryptoNews, CoinPrice, NewsArticle } from '../services/api';
 
 interface CryptoData {
   bitcoin: CoinPrice;
@@ -26,6 +26,7 @@ interface CryptoContextType {
   prices: CryptoData | null;
   globalMetrics: GlobalMetrics | null;
   fearGreed: FearGreedIndex | null;
+  news: NewsArticle[];
   loading: boolean;
   lastUpdated: Date | null;
   hasUpdated: boolean;
@@ -67,6 +68,7 @@ export const CryptoProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
   const [globalMetrics, setGlobalMetrics] = useState<GlobalMetrics | null>(null);
   const [fearGreed, setFearGreed] = useState<FearGreedIndex | null>(null);
+  const [news, setNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(!prices);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [hasUpdated, setHasUpdated] = useState(false);
@@ -102,6 +104,7 @@ export const CryptoProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
       fetchGlobalMetrics();
       fetchFearGreed();
+      fetchNews();
     } catch (err) {
       console.error('Failed to fetch crypto data:', err);
       setError('Failed to fetch data');
@@ -149,6 +152,15 @@ export const CryptoProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     }
   };
 
+  const fetchNews = async () => {
+    try {
+      const articles = await fetchCryptoNews();
+      setNews(articles);
+    } catch (err) {
+      console.error('Failed to fetch crypto news:', err);
+    }
+  };
+
   useEffect(() => {
     fetchAllData();
     const interval = setInterval(fetchAllData, REFRESH_INTERVAL);
@@ -159,6 +171,7 @@ export const CryptoProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     prices,
     globalMetrics,
     fearGreed,
+    news,
     loading,
     lastUpdated,
     hasUpdated,
