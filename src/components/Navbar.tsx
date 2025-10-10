@@ -7,11 +7,11 @@ const Navbar = () => {
   const location = useLocation();
 
   const navItems = [
-    { path: '/', label: '📈 Market Overview', emoji: '📈' },
-    { path: '/forecast', label: ' AI Price Forecast', emoji: '🔮' },
-    { path: '/recovery', label: ' Recovery Tool', emoji: '🛠️' },
-    { path: '/alerts', label: ' Alerts', emoji: '🔔' },
-    { path: '/reports', label: ' Reports', emoji: '📄' },
+    { path: '/', label: '📈 Market Overview' },
+    { path: '/forecast', label: '🔮 AI Price Forecast'},
+    { path: '/recovery', label: '🛠️ Recovery Tool'},
+    { path: '/alerts', label: '🔔 Alerts'},
+    { path: '/reports', label: '📄 Reports'},
   ];
 
   const isActive = (path: string) => location.pathname === path;
