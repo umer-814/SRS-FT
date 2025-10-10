@@ -638,7 +638,7 @@ const Home = () => {
             {/* Market Forecast */}
             <div className="glass rounded-xl border border-dark-border p-6">
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-                🔮 AI Market Forecast
+                 AI Market Forecast
               </h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-3 bg-profit-green/10 rounded-lg border border-profit-green/20">
