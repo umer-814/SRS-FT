@@ -16,36 +16,31 @@ const Sidebar = () => {
   const navItems = [
     { 
       path: '/', 
-      label: 'Market Overview', 
-      emoji: '📈', 
+      label: 'Market Overview',  
       icon: TrendingUp,
       public: true 
     },
     { 
       path: '/forecast', 
       label: 'AI Price Forecast', 
-      emoji: '🔮', 
       icon: Crystal,
       public: false 
     },
     { 
       path: '/recovery', 
       label: 'Recovery Tool', 
-      emoji: '🛠️', 
       icon: Wrench,
       public: false 
     },
     { 
       path: '/alerts', 
       label: 'Alerts', 
-      emoji: '🔔', 
       icon: Bell,
       public: false 
     },
     { 
       path: '/reports', 
-      label: 'Reports', 
-      emoji: '📄', 
+      label: 'Reports',  
       icon: FileText,
       public: false 
     },
