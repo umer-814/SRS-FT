@@ -8,10 +8,10 @@ const Navbar = () => {
 
   const navItems = [
     { path: '/', label: '📈 Market Overview', emoji: '📈' },
-    { path: '/forecast', label: '🔮 AI Price Forecast', emoji: '🔮' },
-    { path: '/recovery', label: '🛠️ Recovery Tool', emoji: '🛠️' },
-    { path: '/alerts', label: '🔔 Alerts', emoji: '🔔' },
-    { path: '/reports', label: '📄 Reports', emoji: '📄' },
+    { path: '/forecast', label: ' AI Price Forecast', emoji: '🔮' },
+    { path: '/recovery', label: ' Recovery Tool', emoji: '🛠️' },
+    { path: '/alerts', label: ' Alerts', emoji: '🔔' },
+    { path: '/reports', label: ' Reports', emoji: '📄' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
