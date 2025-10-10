@@ -386,7 +386,7 @@ const Home = () => {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm">😨😄 Fear & Greed</p>
+                <p className="text-gray-400 text-sm">Fear & Greed</p>
                 {loading || !fearGreed ? (
                   <div className="mt-2 space-y-2">
                     <div className="h-7 w-16 bg-gray-700 animate-pulse rounded"></div>
