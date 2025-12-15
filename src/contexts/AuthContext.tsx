@@ -1,15 +1,20 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+const API_BASE_URL = 'http://localhost:3000';
+
 interface User {
+  id: string;
   email: string;
   name: string;
+  role?: string;
 }
 
 interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  signup: (email: string, password: string) => Promise<boolean>;
+  token: string | null;
+  login: (emailOrPhone: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signup: (name: string, emailOrPhone: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
 
@@ -26,45 +31,88 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedAuth = localStorage.getItem('smartRecoveryAuth');
-    if (storedAuth) {
-      const authData = JSON.parse(storedAuth);
-      setIsAuthenticated(true);
-      setUser(authData.user);
+    const storedToken = localStorage.getItem('smartRecoveryToken');
+    const storedUser = localStorage.getItem('smartRecoveryUser');
+
+    if (storedToken && storedUser) {
+      try {
+        const userData = JSON.parse(storedUser);
+        setToken(storedToken);
+        setUser(userData);
+        setIsAuthenticated(true);
+      } catch (error) {
+        localStorage.removeItem('smartRecoveryToken');
+        localStorage.removeItem('smartRecoveryUser');
+      }
     }
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    // Demo credentials validation
-    if (email === 'demo@crypto.com' && password === 'Demo1234') {
-      const userData = { email, name: 'Demo User' };
-      setIsAuthenticated(true);
-      setUser(userData);
-      localStorage.setItem('smartRecoveryAuth', JSON.stringify({ user: userData }));
-      return true;
+  const login = async (emailOrPhone: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ emailOrPhone, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { success: false, error: data.message || 'Login failed. Please try again.' };
+      }
+
+      if (data.token && data.user) {
+        setToken(data.token);
+        setUser(data.user);
+        setIsAuthenticated(true);
+        localStorage.setItem('smartRecoveryToken', data.token);
+        localStorage.setItem('smartRecoveryUser', JSON.stringify(data.user));
+        return { success: true };
+      }
+
+      return { success: false, error: 'Invalid response from server' };
+    } catch (error) {
+      return { success: false, error: 'Network error. Please check your connection.' };
     }
-    return false;
   };
 
-  const signup = async (email: string, password: string): Promise<boolean> => {
-    // Simulate signup success
-    const userData = { email, name: email.split('@')[0] };
-    setIsAuthenticated(true);
-    setUser(userData);
-    localStorage.setItem('smartRecoveryAuth', JSON.stringify({ user: userData }));
-    return true;
+  const signup = async (name: string, emailOrPhone: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, emailOrPhone, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { success: false, error: data.message || 'Registration failed. Please try again.' };
+      }
+
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: 'Network error. Please check your connection.' };
+    }
   };
 
   const logout = () => {
     setIsAuthenticated(false);
     setUser(null);
-    localStorage.removeItem('smartRecoveryAuth');
+    setToken(null);
+    localStorage.removeItem('smartRecoveryToken');
+    localStorage.removeItem('smartRecoveryUser');
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, signup, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, token, login, signup, logout }}>
       {children}
     </AuthContext.Provider>
   );

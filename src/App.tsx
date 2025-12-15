@@ -15,6 +15,7 @@ import Alerts from './pages/Alerts';
 import Reports from './pages/Reports';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
 import { useAuth } from './contexts/AuthContext';
 
 const AppContent = () => {
@@ -80,6 +81,7 @@ const AppContent = () => {
           <Routes>
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/*" element={
               <>
                 <div className="flex h-screen overflow-hidden">

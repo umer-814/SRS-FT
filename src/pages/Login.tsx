@@ -20,41 +20,34 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const fillDemoCredentials = () => {
-    setFormData({
-      email: 'demo@crypto.com',
-      password: 'Demo1234',
-    });
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const success = await login(formData.email, formData.password);
-      
-      if (success) {
+      const result = await login(formData.email, formData.password);
+
+      if (result.success) {
         setNotification({
           type: 'success',
-          title: '✅ Login Successful',
+          title: 'Login Successful',
           message: 'Welcome back to Smart Recovery System!',
         });
-        
+
         setTimeout(() => {
           navigate('/');
         }, 1500);
       } else {
         setNotification({
           type: 'error',
-          title: '❌ Login Failed',
-          message: 'Invalid email or password. Please try again.',
+          title: 'Login Failed',
+          message: result.error || 'Invalid credentials. Please try again.',
         });
       }
     } catch (error) {
       setNotification({
         type: 'error',
-        title: '❌ Login Error',
+        title: 'Login Error',
         message: 'An unexpected error occurred. Please try again.',
       });
     } finally {
@@ -83,26 +76,6 @@ const Login = () => {
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
           <p className="text-gray-400">Sign in to your Smart Recovery account</p>
-        </div>
-
-        {/* Demo Credentials Card */}
-        <div className="glass border border-gold-highlight/30 rounded-xl p-4 mb-6 glow-gold">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-gold-highlight font-semibold flex items-center">
-              <User className="h-4 w-4 mr-2" />
-              Demo Credentials
-            </h3>
-            <button
-              onClick={fillDemoCredentials}
-              className="text-xs bg-gold-highlight/20 hover:bg-gold-highlight/30 text-gold-highlight px-3 py-1 rounded-full transition-colors btn-press"
-            >
-              Auto Fill
-            </button>
-          </div>
-          <div className="text-sm text-gold-highlight/80 space-y-1">
-            <p>📧 Email: <span className="font-mono text-white">demo@crypto.com</span></p>
-            <p>🔑 Password: <span className="font-mono text-white">Demo1234</span></p>
-          </div>
         </div>
 
         {/* Login Form */}
@@ -155,15 +128,15 @@ const Login = () => {
 
             <div className="flex items-center justify-between">
               <label className="flex items-center">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   className="custom-checkbox mr-2"
                 />
                 <span className="text-sm text-gray-300">Remember me</span>
               </label>
-              <a href="#" className="text-sm text-electric-blue hover:text-blue-400 transition-colors">
+              <Link to="/forgot-password" className="text-sm text-electric-blue hover:text-blue-400 transition-colors">
                 Forgot password?
-              </a>
+              </Link>
             </div>
 
             <button

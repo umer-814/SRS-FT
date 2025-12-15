@@ -5,9 +5,12 @@ import { Eye, EyeOff, Shield, Zap, User, Lock, Mail, Check, X } from 'lucide-rea
 import AnimatedCounter from '../components/AnimatedCounter';
 import Notification from '../components/Notification';
 
+const API_BASE_URL = 'http://localhost:3000';
+
 const Signup = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -23,7 +26,7 @@ const Signup = () => {
     message: string;
   } | null>(null);
 
-  const { signup } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const passwordRequirements = [
@@ -43,38 +46,116 @@ const Signup = () => {
     setPasswordStrength(checkPasswordStrength(password));
   };
 
-  const handleNextStep = () => {
-    if (step === 1 && formData.email) {
+  const handleNextStep = async () => {
+    if (step === 1 && formData.name && formData.email) {
       setStep(2);
     } else if (step === 2 && formData.password && passwordStrength >= 4 && formData.password === formData.confirmPassword) {
-      setStep(3);
+      setLoading(true);
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            emailOrPhone: formData.email,
+            password: formData.password,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setNotification({
+            type: 'error',
+            title: 'Registration Error',
+            message: data.message || 'Failed to register. Please try again.',
+          });
+          setLoading(false);
+          return;
+        }
+
+        setNotification({
+          type: 'success',
+          title: 'Verification Code Sent',
+          message: 'Please check your email or phone for the OTP.',
+        });
+
+        setTimeout(() => {
+          setStep(3);
+          setNotification(null);
+        }, 1500);
+      } catch (error) {
+        setNotification({
+          type: 'error',
+          title: 'Network Error',
+          message: 'Unable to connect to server. Please try again.',
+        });
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
   const handleSubmit = async () => {
     if (formData.verificationCode.length !== 6) return;
-    
+
     setLoading(true);
-    
+
     try {
-      const success = await signup(formData.email, formData.password);
-      
-      if (success) {
+      const response = await fetch(`${API_BASE_URL}/auth/validOTP`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          emailOrPhone: formData.email,
+          otp: formData.verificationCode,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setNotification({
+          type: 'error',
+          title: 'Invalid OTP',
+          message: data.message || 'The verification code is incorrect.',
+        });
+        setLoading(false);
+        return;
+      }
+
+      const loginResult = await login(formData.email, formData.password);
+
+      if (loginResult.success) {
         setNotification({
           type: 'success',
-          title: '🎉 Account Created Successfully',
+          title: 'Account Created Successfully',
           message: 'Welcome to Smart Recovery System!',
         });
-        
+
         setTimeout(() => {
           navigate('/');
+        }, 2000);
+      } else {
+        setNotification({
+          type: 'error',
+          title: 'Login Error',
+          message: 'Account created but login failed. Please try logging in manually.',
+        });
+
+        setTimeout(() => {
+          navigate('/login');
         }, 2000);
       }
     } catch (error) {
       setNotification({
         type: 'error',
-        title: '❌ Signup Error',
-        message: 'Failed to create account. Please try again.',
+        title: 'Signup Error',
+        message: 'An error occurred. Please try again.',
       });
     } finally {
       setLoading(false);
@@ -138,9 +219,26 @@ const Signup = () => {
             <div className="space-y-6">
               <div className="text-center mb-6">
                 <h2 className="text-xl font-semibold text-white mb-2">Step 1: Contact Information</h2>
-                <p className="text-sm text-gray-400">Enter your email or phone number</p>
+                <p className="text-sm text-gray-400">Enter your details to get started</p>
               </div>
-              
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full pl-10 pr-4 py-3 bg-dark-card border border-dark-border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-electric-blue focus:border-transparent transition-all"
+                    placeholder="Enter your full name"
+                    required
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Email or Phone Number
@@ -157,10 +255,10 @@ const Signup = () => {
                   />
                 </div>
               </div>
-              
+
               <button
                 onClick={handleNextStep}
-                disabled={!formData.email}
+                disabled={!formData.name || !formData.email}
                 className="w-full bg-electric-blue hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 btn-press"
               >
                 Continue
